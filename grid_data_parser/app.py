@@ -29,7 +29,7 @@ def lambda_handler(event, context):
         df = pd.json_normalize(content_json["time_series"])
     except Exception as e:
         print("Failed to parse power grid time series data:")
-        raise(e)
+        raise e
 
     print(f"head: {df.head}")
 
