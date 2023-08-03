@@ -1,0 +1,67 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  powerGridParser backend
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 256
+
+Resources:
+  GridDataParser:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: grid_data_parser/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        GridDataParser:
+          Type: Api
+          Properties:
+            Path: /parse
+            Method: get
+
+  GridDataFetcher:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: grid_data_fetcher/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        GridDataFetcher:
+          Type: Api
+          Properties:
+            Path: /fetch
+            Method: get
+#      ProvisionedConcurrencyConfig:
+#        ProvisionedConcurrentExecutions: 1
+#      AutoPublishAlias: live
+#      DeploymentPreference:
+#        Type: AllAtOnce
+
+
+Outputs:
+  GridDataParserAPI:
+    Description: "API Gateway endpoint URL for Prod stage for Grid Data Parser"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/parse/"
+  GridDataParserFunction:
+    Description: "Grid Data Parser Lambda Function ARN"
+    Value: !GetAtt GridDataParser.Arn
+  GridDataParserIamRole:
+    Description: "Implicit IAM Role created for Grid Data Parser function"
+    Value: !GetAtt GridDataParserRole.Arn
+
+  GridDataFetcherAPI:
+    Description: "API Gateway endpoint URL for Prod stage for Grid Data Fetcher"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/fetch/"
+  GridDataFetcherFunction:
+    Description: "Grid Data Fetcher Lambda Function ARN"
+    Value: !GetAtt GridDataFetcher.Arn
+  GridDataFetcherIamRole:
+    Description: "Implicit IAM Role created for Grid Data Fetcher function"
+    Value: !GetAtt GridDataFetcherRole.Arn
